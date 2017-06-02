@@ -6,9 +6,13 @@ import java.util.*;
  */
 
 public class WordSegmentation {
-    static HashMap<String,Integer> map;  //词表
+    public static HashMap<String,Integer> map;  //词表
     static int MAX_LENGTH = 7;  //最大分词长度
     static int INF = -1000000000;
+
+    /**
+     * 载入分词词库
+     */
     public static void init(){
         map = new HashMap<>();
         String str = FileUtil.readFile(new File("SogouLabDic.dic"));
@@ -17,8 +21,18 @@ public class WordSegmentation {
             String[] arr = line.split("\\t");
             map.put(arr[0],Integer.parseInt(arr[1]));
         }
-        System.out.print("");
+        /*map = new HashMap<>();
+        String str = FileUtil.readFile(new File("CorpusWordlist.csv"));
+        String[] lines = str.split("\\n");
+        for(String line : lines){
+            String[] arr = line.split(",");
+            map.put(arr[1],Integer.parseInt(arr[2]));
+        }*/
     }
+
+    /**
+     * 对单句进行分词
+     */
     public static String[] divide(String str){
         int n = str.length()+1;
         //带权有向图
@@ -68,4 +82,56 @@ public class WordSegmentation {
         Collections.reverse(list);
         return list.toArray(new String[0]);
     }
+
+    /**
+     * 对单句进行分词和人名标注并以斜线分隔
+     */
+    public static String divideResult(String str){
+        String res = "";
+        String[] words = divide(str);
+        for(String w:words) {
+            NameIdentification.nameIdentify(w);
+            res += w + "/";
+        }
+        return res.substring(0,res.length()-1);
+    }
+
+    /**
+     * 对文章进行分词和人名标注并以斜线分隔
+     */
+    public static String divideArticle(String str){
+        NameIdentification.preDeal();
+        String[] lines = str.split("\\s*[!:;,.?！…；：”“。，、？ 　\\s]+\\s*");
+        String res = "";
+        for(String l:lines) {
+            if(l.isEmpty())
+                continue;
+            res += divideResult(l) + "\n";
+        }
+        //人名标注
+        HashSet<String> names = NameIdentification.endDeal();
+        for(String name:names)
+            res = res.replace(name,"$"+name+"$");
+        return res;
+    }
+
+    public static void run(String path){
+        //获取要处理的文本文件
+        File file = new File(path);
+        File[] files;
+        if(file.isDirectory())
+            files = file.listFiles();
+        else
+            files = new File[]{file};
+
+        init();
+        NameIdentification.init();
+        for(File f:files){
+            if(f.isFile()&&f.getName().endsWith(".txt")){
+                String str = FileUtil.readFile(f);
+                System.out.println(divideArticle(str));
+            }
+        }
+    }
+
 }
