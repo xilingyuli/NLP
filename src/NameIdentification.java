@@ -43,12 +43,12 @@ public class NameIdentification {
         if(str.length()<2||str.length()>4||WordSegmentation.map.containsKey(str))
             return;
 
-        //姓概率
+        //姓
         float p1 = firstNameMap.getOrDefault(str.charAt(0),0f);
         if(p1<1)
             return;
 
-        //名概率
+        //名
         float p2 = 1;
         for(int i=1;i<str.length();i++)
             p2*=lastNameMap.getOrDefault(str.charAt(i),1f);
@@ -56,11 +56,11 @@ public class NameIdentification {
         if(p2<10)
             return;
 
-        //整体概率
+        //整体
         float p = (float) (Math.pow(p1,0.6)*Math.pow(p2,0.4));
         if(str.length()>3)  //减小长度超过三的词权重
             p/=2;
-        if(p<5)
+        if(p<10)
             return;
 
         if(!names.containsKey(str)) {
@@ -83,6 +83,9 @@ public class NameIdentification {
         for(int i=0;i<list.size()-1;i++)
             if(list.get(i+1).contains(list.get(i)))
                 res.remove(list.get(i));
+        for(String s:res)
+            System.out.print(s+" ");
+        System.out.println();
         return res;
     }
 }

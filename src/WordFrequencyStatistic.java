@@ -1,4 +1,6 @@
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.*;
 
 /**
@@ -82,6 +84,12 @@ public class WordFrequencyStatistic {
                 String str = FileUtil.readFile(f);
                 statistic(str);
             }
+        }
+        try {
+            PrintStream ps=new PrintStream(new FileOutputStream("字频统计结果.txt"));
+            System.setOut(ps);
+        }catch (Exception e){
+            e.printStackTrace();
         }
         calResult();
     }

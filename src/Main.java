@@ -4,8 +4,7 @@
  */
 public class Main {
     public static void main(String args[]){
-        String path = "琅琊榜.txt";
-        WordFrequencyStatistic.run(path);
-        //WordSegmentation.run(path);
+        WordFrequencyStatistic.run("字频统计语料");
+        WordSegmentation.run("琅琊榜.txt");
     }
 }
